@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { ElectiveBank, Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
+import { indexByCode } from '@/domain/pensum'
+import { percentOf } from '@/domain/progress'
 
 const statusStyles: Record<Subject['status'], string> = {
   passed: 'bg-green-100 text-green-800',
@@ -27,15 +29,9 @@ interface BankItemProps {
 function BankItem({ bank, subjects }: BankItemProps) {
   const [open, setOpen] = useState(false)
 
-  const subjectMap = useMemo(
-    () => new Map(subjects.map(s => [s.code, s])),
-    [subjects],
-  )
+  const subjectMap = useMemo(() => indexByCode(subjects), [subjects])
 
-  const percent =
-    bank.credits_required > 0
-      ? Math.min(100, Math.round((bank.credits_approved / bank.credits_required) * 100))
-      : 0
+  const percent = percentOf(bank.credits_approved, bank.credits_required)
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden">

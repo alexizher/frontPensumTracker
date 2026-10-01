@@ -1,3 +1,5 @@
+import { gaugeFractions } from "@/domain/progress";
+
 const CX = 100;
 const CY = 100;
 const R = 80;
@@ -29,14 +31,15 @@ interface Props {
 }
 
 export function ProgressGauge({ completed, inProgress, total }: Props) {
-  const safeTotal = total > 0 ? total : 1;
   // Topar al 100%: ni el arco ni la aguja deben pasar de 180°.
-  const completedFrac = Math.min(1, completed / safeTotal);
-  const inProgressFrac = Math.min(Math.max(0, 1 - completedFrac), inProgress / safeTotal);
-  const completedDeg = completedFrac * 180;
-  const inProgressDeg = inProgressFrac * 180;
+  const { completedFraction, inProgressFraction, percent } = gaugeFractions(
+    completed,
+    inProgress,
+    total,
+  );
+  const completedDeg = completedFraction * 180;
+  const inProgressDeg = inProgressFraction * 180;
   const needleDeg = Math.min(180, completedDeg + inProgressDeg);
-  const percent = Math.round(completedFrac * 100);
   const _MARGIN_TO_ARCH = 20;
 
   const needle = angleToPoint(needleDeg, NEEDLE_R, CX, CY);

@@ -1,8 +1,14 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
-import { clampStart } from '@/domain/pensum'
+import {
+  clampStart,
+  groupBySemester,
+  indexByCode,
+  isPrerequisiteOf,
+  resolvePrerequisites,
+} from '@/domain/pensum'
 import { SubjectCard } from './SubjectCard'
 
 function useVisibleCols() {
@@ -53,27 +59,7 @@ export function PensumGrid({ subjects }: Props) {
   const [startIndex, setStartIndex] = useState(0)
   const colsVisible = useVisibleCols()
 
-  const electives = useMemo(
-    () => subjects.filter(s => s.semester === 0 || s.semester === null || s.semester === 99),
-    [subjects],
-  )
-
-  const bySemester = useMemo(
-    () =>
-      subjects.reduce<Record<number, Subject[]>>((acc, s) => {
-        const sem = s.semester ?? 0
-        if (sem === 0 || sem === 99) return acc
-        acc[sem] = acc[sem] ?? []
-        acc[sem].push(s)
-        return acc
-      }, {}),
-    [subjects],
-  )
-
-  const semesters = useMemo(
-    () => Object.keys(bySemester).map(Number).sort((a, b) => a - b),
-    [bySemester],
-  )
+  const { semesters, bySemester, electives } = useMemo(() => groupBySemester(subjects), [subjects])
 
   const visibleSemesters = useMemo(
     () => semesters.slice(startIndex, startIndex + colsVisible),
@@ -84,31 +70,21 @@ export function PensumGrid({ subjects }: Props) {
   const start = clampStart(startIndex, semesters.length, colsVisible)
   if (start !== startIndex) setStartIndex(start)
 
-  const selectedSubject = useMemo(
-    () => (selectedCode ? (subjects.find(s => s.code === selectedCode) ?? null) : null),
-    [selectedCode, subjects],
+  const subjectsByCode = useMemo(() => indexByCode(subjects), [subjects])
+
+  const selectedSubject = selectedCode ? (subjectsByCode.get(selectedCode) ?? null) : null
+
+  const selectedPrereqs = useMemo(
+    () => (selectedSubject ? resolvePrerequisites(selectedSubject, subjectsByCode) : []),
+    [selectedSubject, subjectsByCode],
   )
-
-  const subjectsByCode = useMemo(() => {
-    const map = new Map<string, Subject>()
-    for (const s of subjects) map.set(s.code, s)
-    return map
-  }, [subjects])
-
-  const selectedPrereqs = useMemo(() => {
-    if (!selectedSubject) return []
-    return selectedSubject.prerequisites.map(code => {
-      const found = subjectsByCode.get(code)
-      return { code, name: found?.name ?? code }
-    })
-  }, [selectedSubject, subjectsByCode])
 
   const canGoLeft = startIndex > 0
   const canGoRight = startIndex + colsVisible < semesters.length
 
-  function handleCardClick(code: string) {
+  const handleCardClick = useCallback((code: string) => {
     setSelectedCode(prev => (prev === code ? null : code))
-  }
+  }, [])
 
   return (
     <div>
@@ -184,7 +160,7 @@ export function PensumGrid({ subjects }: Props) {
         {visibleSemesters.map(sem => (
           <div key={sem} className="min-w-0">
             <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {sem === 0 ? 'Libre' : `Sem ${sem}`}
+              Sem {sem}
             </div>
             <div className="flex flex-col gap-2">
               {bySemester[sem].map(s => (
@@ -192,7 +168,7 @@ export function PensumGrid({ subjects }: Props) {
                   key={s.code}
                   subject={s}
                   isSelected={selectedCode === s.code}
-                  isPrereq={selectedSubject?.prerequisites.includes(s.code) ?? false}
+                  isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
                   onClick={handleCardClick}
                 />
               ))}
@@ -212,7 +188,7 @@ export function PensumGrid({ subjects }: Props) {
                 key={s.code}
                 subject={s}
                 isSelected={selectedCode === s.code}
-                isPrereq={selectedSubject?.prerequisites.includes(s.code) ?? false}
+                isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
                 onClick={handleCardClick}
               />
             ))}
