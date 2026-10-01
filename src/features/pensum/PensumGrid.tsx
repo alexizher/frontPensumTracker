@@ -12,6 +12,7 @@ import {
 import { Alert } from '@/components/ui/Alert'
 import { IconButton } from '@/components/ui/IconButton'
 import { SubjectCard } from './SubjectCard'
+import { STATUS_LEGEND, SUBJECT_STATUS } from './subject-status'
 
 function useVisibleCols() {
   const [cols, setCols] = useState(2)
@@ -38,17 +39,10 @@ function useVisibleCols() {
 }
 
 // Hoisted: static, never changes between renders
-const legendItems = [
-  { status: 'passed' as const, label: 'Aprobada', color: 'bg-green-400' },
-  { status: 'in_progress' as const, label: 'En curso', color: 'bg-blue-400' },
-  { status: 'available' as const, label: 'Disponible', color: 'bg-amber-400' },
-  { status: 'locked' as const, label: 'Bloqueada', color: 'bg-gray-300' },
-]
-
-const LegendDots = legendItems.map(item => (
+const LegendDots = STATUS_LEGEND.map(item => (
   <span key={item.status} className="flex items-center gap-1 text-xs text-gray-600">
-    <span className={cn('inline-block w-3 h-3 rounded-sm', item.color)} />
-    {item.label}
+    <span className={cn('inline-block w-3 h-3 rounded-sm', item.dot)} />
+    {SUBJECT_STATUS[item.status].label}
   </span>
 ))
 

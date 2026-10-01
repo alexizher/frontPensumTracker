@@ -65,6 +65,25 @@ describe('PensumGrid', () => {
     expect(screen.getByText('1–2 de 4')).toBeInTheDocument()
   })
 
+  it('pinta la leyenda con cuatro estados, en orden y con su color', () => {
+    render(<PensumGrid subjects={subjects} />)
+    const legend = screen.getByText('Toca una materia para ver prerrequisitos').parentElement!
+    const items = [...legend.children].slice(0, -1)
+
+    expect(items.map(item => item.textContent)).toEqual([
+      'Aprobada',
+      'En curso',
+      'Disponible',
+      'Bloqueada',
+    ])
+    expect(items.map(item => item.firstElementChild?.className.match(/bg-\S+/)?.[0])).toEqual([
+      'bg-green-400',
+      'bg-blue-400',
+      'bg-amber-400',
+      'bg-gray-300',
+    ])
+  })
+
   it('muestra las electivas en su propio bloque, fuera de los semestres', () => {
     render(<PensumGrid subjects={subjects} />)
 
