@@ -1,5 +1,5 @@
 import type { AcademicRecord, Subject } from '@/types/academic'
-import type { StreamEvent } from '@/services/api'
+import type { StreamEvent } from '@/types/stream'
 
 type SubjectSeed = Pick<Subject, 'code' | 'name' | 'credits' | 'semester' | 'status'> &
   Partial<Subject>

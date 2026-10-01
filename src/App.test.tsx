@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import App from './App'
-import type { StreamEvent } from '@/services/api'
+import type { StreamEvent } from '@/types/stream'
 import { ndjsonResponse } from '@/test/stream'
 import { recordEvents } from '@/test/fixtures/academic-record'
 

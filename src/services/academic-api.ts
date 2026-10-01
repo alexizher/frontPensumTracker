@@ -1,27 +1,6 @@
-import type { AcademicRecord, Subject } from '@/types/academic'
+import type { StreamEvent } from '@/types/stream'
 
 const BASE_URL = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api`
-
-interface StudentInfoData {
-  student_name: string
-  program_name: string
-  program_code: string
-}
-
-interface ProgramInfoData {
-  pensum_version: number
-  version_actual: number
-  enrolled_version: number | null
-  versiones: number[]
-  total_credits: number
-}
-
-export type StreamEvent =
-  | { stage: 'student_info'; data: StudentInfoData }
-  | { stage: 'program_info'; data: ProgramInfoData }
-  | { stage: 'pensum'; data: { subjects: Subject[] } }
-  | { stage: 'record'; data: AcademicRecord }
-  | { stage: 'error'; status: number; detail: string }
 
 export async function streamLoginAndFetch(
   username: string,

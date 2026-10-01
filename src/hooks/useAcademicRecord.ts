@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import type { AcademicRecord } from '@/types/academic'
-import { streamLoginAndFetch, type StreamEvent } from '@/services/api'
+import type { StreamEvent } from '@/types/stream'
+import { streamLoginAndFetch } from '@/services/academic-api'
 
 type Status = 'idle' | 'loading' | 'error'
 
