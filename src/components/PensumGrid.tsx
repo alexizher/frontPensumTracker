@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
@@ -82,9 +82,9 @@ export function PensumGrid({ subjects }: Props) {
   const canGoLeft = startIndex > 0
   const canGoRight = startIndex + colsVisible < semesters.length
 
-  function handleCardClick(code: string) {
+  const handleCardClick = useCallback((code: string) => {
     setSelectedCode(prev => (prev === code ? null : code))
-  }
+  }, [])
 
   return (
     <div>
