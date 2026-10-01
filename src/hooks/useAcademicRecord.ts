@@ -1,53 +1,27 @@
-import { useState, useRef, useCallback } from 'react'
-import type { AcademicRecord } from '@/types/academic'
-import type { StreamEvent } from '@/types/stream'
+import { useCallback, useReducer, useRef } from 'react'
+import { initialRecordState, recordReducer } from '@/domain/academic-record'
 import { streamLoginAndFetch } from '@/services/academic-api'
 
-type Status = 'idle' | 'loading' | 'error'
-
-export type PartialRecord = Partial<AcademicRecord>
-
-function mergeStage(prev: PartialRecord | null, event: StreamEvent): PartialRecord {
-  const base = prev ?? {}
-  switch (event.stage) {
-    case 'student_info':
-    case 'program_info':
-    case 'record':
-      return { ...base, ...event.data }
-    case 'pensum':
-      if (base.completed_credits !== undefined) return base
-      return { ...base, subjects: event.data.subjects }
-    default:
-      return base
-  }
-}
-
 export function useAcademicRecord() {
-  const [status, setStatus] = useState<Status>('idle')
-  const [error, setError] = useState<string | null>(null)
-  const [data, setData] = useState<PartialRecord | null>(null)
+  const [state, dispatch] = useReducer(recordReducer, initialRecordState)
+  // Las credenciales viven solo en memoria, para poder pedir otra versión del pensum.
   const credsRef = useRef<{ username: string; password: string } | null>(null)
 
   const run = useCallback(
     async (username: string, password: string, pensumVersion: number, keepData: boolean) => {
       credsRef.current = { username, password }
-      setStatus('loading')
-      setError(null)
-      if (!keepData) setData(null)
+      dispatch({ type: 'start', keepData })
 
       try {
         await streamLoginAndFetch(username, password, pensumVersion, event => {
-          if (event.stage === 'error') {
-            setError(event.detail)
-            setStatus('error')
-            return
-          }
-          setData(prev => mergeStage(prev, event))
+          dispatch({ type: 'stage', event })
         })
-        setStatus(prev => (prev === 'error' ? prev : 'idle'))
+        dispatch({ type: 'done' })
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido')
-        setStatus('error')
+        dispatch({
+          type: 'fail',
+          message: err instanceof Error ? err.message : 'Error desconocido',
+        })
       }
     },
     [],
@@ -69,10 +43,8 @@ export function useAcademicRecord() {
 
   const reset = useCallback(() => {
     credsRef.current = null
-    setData(null)
-    setError(null)
-    setStatus('idle')
+    dispatch({ type: 'reset' })
   }, [])
 
-  return { status, error, data, load, reset, changeVersion }
+  return { status: state.status, error: state.error, data: state.data, load, reset, changeVersion }
 }
