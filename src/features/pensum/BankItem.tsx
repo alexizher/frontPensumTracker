@@ -7,29 +7,14 @@ import { percentOf } from '@/domain/progress'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { SUBJECT_STATUS } from './subject-status'
 
-const statusStyles: Record<Subject['status'], string> = {
-  passed: 'bg-green-100 text-green-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  available: 'bg-amber-100 text-amber-800',
-  locked: 'bg-gray-100 text-gray-500',
-  not_needed: 'bg-gray-50 text-gray-400',
-}
-
-const statusLabel: Record<Subject['status'], string> = {
-  passed: 'Aprobada',
-  in_progress: 'En curso',
-  available: 'Disponible',
-  locked: 'Bloqueada',
-  not_needed: 'No requerida',
-}
-
-interface BankItemProps {
+interface Props {
   bank: ElectiveBank
   subjects: Subject[]
 }
 
-function BankItem({ bank, subjects }: BankItemProps) {
+export function BankItem({ bank, subjects }: Props) {
   const [open, setOpen] = useState(false)
 
   const subjectMap = useMemo(() => indexByCode(subjects), [subjects])
@@ -64,8 +49,8 @@ function BankItem({ bank, subjects }: BankItemProps) {
                   <span className="truncate text-gray-800">{subject?.name ?? '—'}</span>
                 </div>
                 {subject ? (
-                  <Badge className={cn('ml-2 shrink-0', statusStyles[subject.status])}>
-                    {statusLabel[subject.status]}
+                  <Badge className={cn('ml-2 shrink-0', SUBJECT_STATUS[subject.status].badge)}>
+                    {SUBJECT_STATUS[subject.status].label}
                   </Badge>
                 ) : null}
               </li>
@@ -73,27 +58,6 @@ function BankItem({ bank, subjects }: BankItemProps) {
           })}
         </ul>
       ) : null}
-    </div>
-  )
-}
-
-interface Props {
-  banks: ElectiveBank[]
-  subjects: Subject[]
-}
-
-export function ElectiveBanks({ banks, subjects }: Props) {
-  if (banks.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No hay bancos de electivas registrados.</p>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      {banks.map(bank => (
-        <BankItem key={bank.name} bank={bank} subjects={subjects} />
-      ))}
     </div>
   )
 }

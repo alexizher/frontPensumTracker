@@ -65,6 +65,45 @@ describe('PensumGrid', () => {
     expect(screen.getByText('1–2 de 4')).toBeInTheDocument()
   })
 
+  it('a 768 px caben los cuatro semestres y el paginador desaparece', () => {
+    render(<PensumGrid subjects={subjects} />)
+
+    act(() => setViewportWidth(640))
+    expect(screen.getByText('1–3 de 4')).toBeInTheDocument()
+
+    act(() => setViewportWidth(768))
+    expect(screen.queryByRole('button', { name: 'Semestres siguientes' })).not.toBeInTheDocument()
+    expect(screen.getByText('Sem 4')).toBeInTheDocument()
+  })
+
+  it('reparte el ancho entre los semestres que hay, no entre las columnas que caben', () => {
+    render(<PensumGrid subjects={subjects} />)
+
+    act(() => setViewportWidth(1024))
+
+    const grid = screen.getByText('Sem 1').parentElement!.parentElement!
+    expect(grid.getAttribute('style')).toContain('repeat(4, minmax(0, 1fr))')
+  })
+
+  it('pinta la leyenda con cuatro estados, en orden y con su color', () => {
+    render(<PensumGrid subjects={subjects} />)
+    const legend = screen.getByText('Toca una materia para ver prerrequisitos').parentElement!
+    const items = [...legend.children].slice(0, -1)
+
+    expect(items.map(item => item.textContent)).toEqual([
+      'Aprobada',
+      'En curso',
+      'Disponible',
+      'Bloqueada',
+    ])
+    expect(items.map(item => item.firstElementChild?.className.match(/bg-\S+/)?.[0])).toEqual([
+      'bg-green-400',
+      'bg-blue-400',
+      'bg-amber-400',
+      'bg-gray-300',
+    ])
+  })
+
   it('muestra las electivas en su propio bloque, fuera de los semestres', () => {
     render(<PensumGrid subjects={subjects} />)
 
@@ -84,6 +123,7 @@ describe('PensumGrid', () => {
     await user.click(screen.getByText('MAT201'))
 
     const panel = screen.getByRole('status')
+    expect(panel).toHaveAttribute('aria-live', 'polite')
     expect(within(panel).getByText('Cálculo II')).toBeInTheDocument()
     expect(within(panel).getByText('MAT101')).toBeInTheDocument()
     expect(within(panel).getByText('Cálculo I')).toBeInTheDocument()

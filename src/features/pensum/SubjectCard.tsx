@@ -1,14 +1,7 @@
 import { memo } from 'react'
 import { cn } from '@/lib/utils'
 import type { Subject } from '@/types/academic'
-
-const statusStyles: Record<Subject['status'], string> = {
-  passed: 'bg-green-100 border-green-300 text-green-900',
-  in_progress: 'bg-blue-100 border-blue-300 text-blue-900',
-  available: 'bg-amber-100 border-amber-300 text-amber-900',
-  locked: 'bg-gray-100 border-gray-200 text-gray-400',
-  not_needed: 'bg-gray-50 border-gray-200 text-gray-400 border-dashed',
-}
+import { SUBJECT_STATUS } from './subject-status'
 
 interface Props {
   subject: Subject
@@ -29,7 +22,7 @@ export const SubjectCard = memo(function SubjectCard({
       className={cn(
         'w-full min-h-[88px] rounded-lg border p-2 text-xs flex flex-col justify-between',
         onClick ? 'cursor-pointer transition-shadow hover:shadow-md' : '',
-        statusStyles[s.status],
+        SUBJECT_STATUS[s.status].card,
         isSelected && 'ring-2 ring-offset-1 ring-gray-800',
         isPrereq && 'ring-2 ring-offset-1 ring-orange-400',
       )}

@@ -22,6 +22,14 @@ describe('ProgressGauge', () => {
     expect(needle?.getAttribute('y2')).toBe('35.59')
   })
 
+  it('pinta el fondo en gris, lo aprobado en verde y lo que está en curso en azul', () => {
+    const { container } = render(<ProgressGauge completed={12} inProgress={4} total={35} />)
+    const strokes = [...container.querySelectorAll('path')].map(path => path.getAttribute('stroke'))
+
+    expect(strokes).toEqual(['#e5e7eb', '#22c55e', '#3b82f6'])
+    expect(container.querySelector('line')?.getAttribute('stroke')).toBe('#1f2937')
+  })
+
   it('no dibuja tramos cuando no hay avance', () => {
     const { container } = render(<ProgressGauge completed={0} inProgress={0} total={35} />)
 
