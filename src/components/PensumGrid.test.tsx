@@ -50,12 +50,28 @@ describe('PensumGrid', () => {
     expect(screen.getByText('1–2 de 4')).toBeInTheDocument()
   })
 
+  it('mantiene semestres válidos cuando cambia la lista de materias estando al final', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<PensumGrid subjects={subjects} />)
+    await user.click(next())
+    await user.click(next())
+    expect(screen.getByText('3–4 de 4')).toBeInTheDocument()
+
+    rerender(<PensumGrid subjects={subjects.filter(s => s.semester !== 4)} />)
+    expect(screen.getByText('2–3 de 3')).toBeInTheDocument()
+
+    rerender(<PensumGrid subjects={[]} />)
+    rerender(<PensumGrid subjects={subjects} />)
+    expect(screen.getByText('1–2 de 4')).toBeInTheDocument()
+  })
+
   it('muestra las electivas en su propio bloque, fuera de los semestres', () => {
     render(<PensumGrid subjects={subjects} />)
 
     expect(screen.getByText('Electivas')).toBeInTheDocument()
     expect(screen.getByText('Robótica')).toBeInTheDocument()
     expect(screen.getByText('Minería de Datos')).toBeInTheDocument()
+    expect(screen.getByText('Ajedrez')).toBeInTheDocument()
     expect(screen.queryByText('Sem 0')).not.toBeInTheDocument()
     expect(screen.queryByText('Sem 99')).not.toBeInTheDocument()
   })
