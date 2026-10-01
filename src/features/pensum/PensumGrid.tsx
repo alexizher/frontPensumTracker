@@ -1,7 +1,5 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useMemo, useCallback } from 'react'
 import type { Subject } from '@/types/academic'
-import { cn } from '@/lib/utils'
 import {
   clampStart,
   groupBySemester,
@@ -9,42 +7,11 @@ import {
   isPrerequisiteOf,
   resolvePrerequisites,
 } from '@/domain/pensum'
-import { Alert } from '@/components/ui/Alert'
-import { IconButton } from '@/components/ui/IconButton'
+import { PrerequisitePanel } from './PrerequisitePanel'
+import { SemesterPager } from './SemesterPager'
+import { StatusLegend } from './StatusLegend'
 import { SubjectCard } from './SubjectCard'
-import { STATUS_LEGEND, SUBJECT_STATUS } from './subject-status'
-
-function useVisibleCols() {
-  const [cols, setCols] = useState(2)
-
-  useEffect(() => {
-    const queries = [
-      { mq: window.matchMedia('(min-width: 1024px)'), n: 6 },
-      { mq: window.matchMedia('(min-width: 768px)'), n: 4 },
-      { mq: window.matchMedia('(min-width: 640px)'), n: 3 },
-    ]
-
-    const update = () => {
-      setCols(queries.find(q => q.mq.matches)?.n ?? 2)
-    }
-
-    update()
-    for (const q of queries) q.mq.addEventListener('change', update)
-    return () => {
-      for (const q of queries) q.mq.removeEventListener('change', update)
-    }
-  }, [])
-
-  return cols
-}
-
-// Hoisted: static, never changes between renders
-const LegendDots = STATUS_LEGEND.map(item => (
-  <span key={item.status} className="flex items-center gap-1 text-xs text-gray-600">
-    <span className={cn('inline-block w-3 h-3 rounded-sm', item.dot)} />
-    {SUBJECT_STATUS[item.status].label}
-  </span>
-))
+import { useVisibleCols } from './useVisibleCols'
 
 interface Props {
   subjects: Subject[]
@@ -75,73 +42,48 @@ export function PensumGrid({ subjects }: Props) {
     [selectedSubject, subjectsByCode],
   )
 
-  const canGoLeft = startIndex > 0
-  const canGoRight = startIndex + colsVisible < semesters.length
-
   const handleCardClick = useCallback((code: string) => {
     setSelectedCode(prev => (prev === code ? null : code))
   }, [])
+
+  function renderCard(subject: Subject) {
+    return (
+      <SubjectCard
+        key={subject.code}
+        subject={subject}
+        isSelected={selectedCode === subject.code}
+        isPrereq={isPrerequisiteOf(selectedSubject, subject.code)}
+        onClick={handleCardClick}
+      />
+    )
+  }
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold text-foreground">Pensum</h2>
         {semesters.length > colsVisible ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <IconButton
-              onClick={() => setStartIndex(i => i - 1)}
-              disabled={!canGoLeft}
-              aria-label="Semestres anteriores"
-            >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-            </IconButton>
-            <span className="text-xs tabular-nums text-muted-foreground">
-              {startIndex + 1}–{Math.min(startIndex + colsVisible, semesters.length)}{' '}
-              de {semesters.length}
-            </span>
-            <IconButton
-              onClick={() => setStartIndex(i => i + 1)}
-              disabled={!canGoRight}
-              aria-label="Semestres siguientes"
-            >
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </IconButton>
-          </div>
+          <SemesterPager
+            start={startIndex}
+            pageSize={colsVisible}
+            total={semesters.length}
+            onPrevious={() => setStartIndex(i => i - 1)}
+            onNext={() => setStartIndex(i => i + 1)}
+          />
         ) : null}
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-        {LegendDots}
-        {selectedSubject ? (
-          <span className="text-xs text-muted-foreground">
-            Toca de nuevo para deseleccionar
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground">
-            Toca una materia para ver prerrequisitos
-          </span>
-        )}
+        <StatusLegend />
+        <span className="text-xs text-muted-foreground">
+          {selectedSubject
+            ? 'Toca de nuevo para deseleccionar'
+            : 'Toca una materia para ver prerrequisitos'}
+        </span>
       </div>
 
       {selectedSubject ? (
-        <Alert variant="info" role="status" aria-live="polite" className="mb-3">
-          <p className="font-medium leading-snug">{selectedSubject.name}</p>
-          {selectedPrereqs.length > 0 ? (
-            <ul className="mt-1.5 space-y-1 text-sm leading-snug text-orange-900/90">
-              {selectedPrereqs.map(p => (
-                <li key={p.code}>
-                  <span className="font-mono text-xs opacity-70">{p.code}</span>
-                  <span className="mx-1.5 text-orange-300" aria-hidden="true">
-                    ·
-                  </span>
-                  {p.name}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-1 text-sm text-orange-900/80">Sin prerrequisitos</p>
-          )}
-        </Alert>
+        <PrerequisitePanel subject={selectedSubject} prerequisites={selectedPrereqs} />
       ) : null}
 
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${visibleSemesters.length}, minmax(0, 1fr))` }}>
@@ -150,17 +92,7 @@ export function PensumGrid({ subjects }: Props) {
             <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Sem {sem}
             </div>
-            <div className="flex flex-col gap-2">
-              {bySemester[sem].map(s => (
-                <SubjectCard
-                  key={s.code}
-                  subject={s}
-                  isSelected={selectedCode === s.code}
-                  isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
-                  onClick={handleCardClick}
-                />
-              ))}
-            </div>
+            <div className="flex flex-col gap-2">{bySemester[sem].map(renderCard)}</div>
           </div>
         ))}
       </div>
@@ -171,15 +103,7 @@ export function PensumGrid({ subjects }: Props) {
             Electivas
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {electives.map(s => (
-              <SubjectCard
-                key={s.code}
-                subject={s}
-                isSelected={selectedCode === s.code}
-                isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
-                onClick={handleCardClick}
-              />
-            ))}
+            {electives.map(renderCard)}
           </div>
         </div>
       ) : null}
