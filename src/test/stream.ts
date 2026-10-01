@@ -1,4 +1,4 @@
-import type { StreamEvent } from '@/services/api'
+import type { StreamEvent } from '@/types/stream'
 
 // Respuesta NDJSON troceada en chunks pequeños, como la entrega la red.
 export function ndjsonResponse(events: StreamEvent[], chunkSize = 64): Response {

@@ -1,4 +1,4 @@
-import type { PartialRecord } from '@/hooks/useAcademicRecord'
+import type { PartialRecord } from '@/domain/academic-record'
 import { Alert } from '@/components/ui/Alert'
 import { Collapsible } from '@/components/ui/Collapsible'
 import { AvailableSubjects } from '@/features/pensum/AvailableSubjects'

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Dashboard } from './Dashboard'
-import type { PartialRecord } from '@/hooks/useAcademicRecord'
+import type { PartialRecord } from '@/domain/academic-record'
 import { record, subjects } from '@/test/fixtures/academic-record'
 
 function renderDashboard(data: PartialRecord, handlers: Partial<Parameters<typeof Dashboard>[0]> = {}) {
