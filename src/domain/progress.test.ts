@@ -15,7 +15,11 @@ describe('percentOf', () => {
   it('devuelve 0 cuando el total es 0 o negativo', () => {
     expect(percentOf(0, 0)).toBe(0)
     expect(percentOf(5, 0)).toBe(0)
-    expect(percentOf(5, -1)).toBe(0)
+    expect(percentOf(-5, -1)).toBe(0)
+  })
+
+  it('devuelve 0 cuando el total no es un número', () => {
+    expect(percentOf(5, NaN)).toBe(0)
   })
 
   it('no devuelve porcentajes negativos', () => {
@@ -43,6 +47,10 @@ describe('gaugeFractions', () => {
     expect(result.inProgress).toBeCloseTo(5 / 35)
   })
 
+  it('redondea el porcentaje al entero más cercano, también hacia arriba', () => {
+    expect(gaugeFractions(23, 0, 35).percent).toBe(66)
+  })
+
   it('devuelve ceros cuando no hay avance', () => {
     expect(gaugeFractions(0, 0, 35)).toEqual({ completed: 0, inProgress: 0, percent: 0 })
   })
@@ -50,5 +58,6 @@ describe('gaugeFractions', () => {
   it('con total 0 trata cualquier crédito aprobado como 100 %', () => {
     expect(gaugeFractions(5, 2, 0)).toEqual({ completed: 1, inProgress: 0, percent: 100 })
     expect(gaugeFractions(0, 0, 0)).toEqual({ completed: 0, inProgress: 0, percent: 0 })
+    expect(gaugeFractions(5, 2, -10)).toEqual({ completed: 1, inProgress: 0, percent: 100 })
   })
 })

@@ -31,7 +31,9 @@ export function groupBySemester(subjects: Subject[]): SemesterGroups {
       electives.push(subject)
       continue
     }
-    const semester = subject.semester ?? 0
+    const semester = subject.semester
+    // El tipo no lo permite, pero una materia sin el campo se descarta.
+    if (semester == null) continue
     const group = bySemester[semester] ?? []
     group.push(subject)
     bySemester[semester] = group

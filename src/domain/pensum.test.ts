@@ -85,6 +85,24 @@ describe('groupBySemester', () => {
     expect(codes(groups.electives)).toEqual(['E0', 'E99', 'EN'])
   })
 
+  it('conserva las mismas materias, sin copiarlas', () => {
+    const a = subject('A', 1)
+    const elective = subject('E', 0)
+    const groups = groupBySemester([a, elective])
+
+    expect(groups.bySemester[1][0]).toBe(a)
+    expect(groups.electives[0]).toBe(elective)
+  })
+
+  it('descarta una materia que llega sin el campo semestre', () => {
+    const broken = { ...subject('X', 1), semester: undefined } as unknown as Subject
+    const groups = groupBySemester([subject('A', 1), broken])
+
+    expect(groups.semesters).toEqual([1])
+    expect(codes(groups.bySemester[1])).toEqual(['A'])
+    expect(groups.electives).toEqual([])
+  })
+
   it('ordena los semestres como números', () => {
     const groups = groupBySemester([subject('A', 10), subject('B', 2), subject('C', 1)])
 
@@ -170,6 +188,15 @@ describe('availableSubjects', () => {
     ])
 
     expect(codes(result)).toEqual(['A', 'D', 'B', 'C'])
+  })
+
+  it('ordena los semestres como números, no como texto', () => {
+    const result = availableSubjects([
+      subject('B', 10, { status: 'available' }),
+      subject('A', 2, { status: 'available' }),
+    ])
+
+    expect(codes(result)).toEqual(['A', 'B'])
   })
 
   it('pone al final las materias sin semestre', () => {
