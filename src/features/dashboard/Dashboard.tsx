@@ -9,10 +9,11 @@ import { IconButton } from '@/components/ui/IconButton'
 import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { ProgressGauge } from './ProgressGauge'
-import { PensumGrid } from './PensumGrid'
-import { AvailableSubjectsTable } from './AvailableSubjectsTable'
-import { ElectiveBanks } from './ElectiveBanks'
-import { GaugeSkeleton, PensumGridSkeleton, TableSkeleton } from './Skeletons'
+import { GaugeSkeleton } from './skeletons'
+import { AvailableSubjects } from '@/features/pensum/AvailableSubjects'
+import { ElectiveBanks } from '@/features/pensum/ElectiveBanks'
+import { PensumGrid } from '@/features/pensum/PensumGrid'
+import { PensumGridSkeleton, TableSkeleton } from '@/features/pensum/skeletons'
 
 interface VersionSelectorProps {
   currentVersion: number
@@ -200,7 +201,7 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
       </section>
 
       <Collapsible title="Materias disponibles">
-        {isComplete ? <AvailableSubjectsTable subjects={data.subjects!} /> : <TableSkeleton />}
+        {isComplete ? <AvailableSubjects subjects={data.subjects!} /> : <TableSkeleton />}
       </Collapsible>
 
       <Collapsible title="Electivas">

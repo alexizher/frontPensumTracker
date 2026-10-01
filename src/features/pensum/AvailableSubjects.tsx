@@ -7,7 +7,7 @@ interface Props {
   subjects: Subject[]
 }
 
-export function AvailableSubjectsTable({ subjects }: Props) {
+export function AvailableSubjects({ subjects }: Props) {
   const available = useMemo(() => availableSubjects(subjects), [subjects])
 
   if (available.length === 0) {

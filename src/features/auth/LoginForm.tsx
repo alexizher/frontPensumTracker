@@ -8,7 +8,7 @@ interface Props {
   loading: boolean;
 }
 
-export function CookieInput({ onSubmit, loading }: Props) {
+export function LoginForm({ onSubmit, loading }: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
