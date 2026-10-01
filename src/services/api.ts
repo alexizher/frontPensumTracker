@@ -11,6 +11,7 @@ interface StudentInfoData {
 interface ProgramInfoData {
   pensum_version: number
   version_actual: number
+  enrolled_version: number | null
   versiones: number[]
   total_credits: number
 }

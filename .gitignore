@@ -43,6 +43,7 @@ lerna-debug.log*
 # Claude Code y skills
 .claude/
 .agents/
+skills-lock.json
 
 # macOS
 .DS_Store
