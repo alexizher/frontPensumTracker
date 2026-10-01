@@ -44,6 +44,13 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('bg-primary', 'w-full')
   })
 
+  it('deja que className pise una clase de la variante', () => {
+    render(<Button className="px-8">Guardar</Button>)
+
+    expect(screen.getByRole('button')).toHaveClass('px-8')
+    expect(screen.getByRole('button')).not.toHaveClass('px-4')
+  })
+
   it('la variante ghost no lleva el fondo de primary', () => {
     render(<Button variant="ghost">Ver más</Button>)
 

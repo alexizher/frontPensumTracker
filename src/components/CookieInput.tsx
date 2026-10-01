@@ -49,8 +49,8 @@ export function CookieInput({ onSubmit, loading }: Props) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            visible={showPassword}
-            onVisibleChange={setShowPassword}
+            revealed={showPassword}
+            onRevealedChange={setShowPassword}
           />
         </div>
 

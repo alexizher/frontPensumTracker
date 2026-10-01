@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
@@ -12,8 +12,9 @@ const alertVariants = cva('border', {
   },
 })
 
-type Props = HTMLAttributes<HTMLDivElement> &
-  Required<Pick<VariantProps<typeof alertVariants>, 'variant'>>
+type Props = ComponentProps<'div'> & {
+  variant: NonNullable<VariantProps<typeof alertVariants>['variant']>
+}
 
 export function Alert({ variant, className, ...props }: Props) {
   return <div className={cn(alertVariants({ variant }), className)} {...props} />

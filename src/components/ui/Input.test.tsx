@@ -1,3 +1,4 @@
+import { createRef } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -19,6 +20,13 @@ describe('Input', () => {
     render(<Input placeholder="x" className="pr-10" />)
 
     expect(screen.getByPlaceholderText('x')).toHaveClass('w-full', 'px-3', 'pr-10')
+  })
+
+  it('entrega el elemento por ref', () => {
+    const ref = createRef<HTMLInputElement>()
+    render(<Input ref={ref} placeholder="x" />)
+
+    expect(ref.current).toBe(screen.getByPlaceholderText('x'))
   })
 
   it('se puede deshabilitar', () => {

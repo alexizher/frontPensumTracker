@@ -28,6 +28,15 @@ describe('Alert', () => {
     expect(screen.getByText('aviso')).toHaveClass('border', 'bg-orange-50')
   })
 
+  it('exige una variante en el tipo', () => {
+    // @ts-expect-error sin variante la caja no tendría color ni relleno
+    render(<Alert>sin variante</Alert>)
+    // @ts-expect-error null tampoco es una variante
+    render(<Alert variant={null}>nula</Alert>)
+
+    expect(screen.getByText('sin variante')).toBeInTheDocument()
+  })
+
   it('suma las clases que recibe', () => {
     render(
       <Alert variant="error" className="mb-6">

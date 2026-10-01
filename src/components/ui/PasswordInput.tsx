@@ -1,30 +1,39 @@
-import { useState, type InputHTMLAttributes } from 'react'
+import { useState, type ComponentProps } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from './Input'
 
-interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  // Con `visible` definido el componente es controlado y solo avisa por onVisibleChange.
-  visible?: boolean
-  onVisibleChange?: (visible: boolean) => void
+interface Props extends Omit<ComponentProps<'input'>, 'type'> {
+  // Con `revealed` definido el componente es controlado: no guarda estado propio
+  // y solo avisa por onRevealedChange. No se debe alternar entre los dos modos.
+  revealed?: boolean
+  onRevealedChange?: (revealed: boolean) => void
 }
 
-export function PasswordInput({ visible, onVisibleChange, disabled, className, ...props }: Props) {
-  const [internalVisible, setInternalVisible] = useState(false)
-  const shown = visible ?? internalVisible
+export function PasswordInput({
+  revealed,
+  onRevealedChange,
+  disabled,
+  className,
+  ...props
+}: Props) {
+  const [internalRevealed, setInternalRevealed] = useState(false)
+  const controlled = revealed !== undefined
+  const shown = controlled ? revealed : internalRevealed
 
   function toggle() {
-    if (visible === undefined) setInternalVisible(!shown)
-    onVisibleChange?.(!shown)
+    if (!controlled) setInternalRevealed(!shown)
+    onRevealedChange?.(!shown)
   }
 
   return (
     <div className="relative">
       <Input
-        type={shown ? 'text' : 'password'}
         disabled={disabled}
-        className={cn('pr-10', className)}
+        // pr-10 va al final para que ningún relleno externo tape el hueco del ojo.
+        className={cn(className, 'pr-10')}
         {...props}
+        type={shown ? 'text' : 'password'}
       />
       <button
         type="button"

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
@@ -7,18 +7,18 @@ const iconButtonVariants = cva(
   {
     variants: {
       variant: {
-        outline:
+        neutral:
           'border-input text-muted-foreground hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30',
         danger:
           'border-border bg-secondary text-foreground shadow-sm hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive',
       },
     },
-    defaultVariants: { variant: 'outline' },
+    defaultVariants: { variant: 'neutral' },
   },
 )
 
 // Un botón de solo ícono necesita nombre accesible: aria-label es obligatorio.
-type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> &
+type Props = Omit<ComponentProps<'button'>, 'aria-label'> &
   VariantProps<typeof iconButtonVariants> & { 'aria-label': string }
 
 export function IconButton({ variant, className, type = 'button', ...props }: Props) {

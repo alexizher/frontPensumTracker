@@ -33,7 +33,7 @@ describe('IconButton', () => {
     expect(button).toBeDisabled()
   })
 
-  it('usa la variante outline por defecto y suma las clases que recibe', () => {
+  it('usa la variante neutral por defecto y suma las clases que recibe', () => {
     render(<IconButton aria-label="Siguiente" className="shrink-0" />)
 
     expect(screen.getByRole('button')).toHaveClass('size-11', 'border-input', 'shrink-0')

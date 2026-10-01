@@ -10,6 +10,10 @@ describe('PasswordInput', () => {
     const user = userEvent.setup()
     render(<PasswordInput placeholder="clave" />)
     expect(field()).toHaveAttribute('type', 'password')
+    expect(screen.getByRole('button', { name: 'Mostrar contraseña' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
 
     await user.click(screen.getByRole('button', { name: 'Mostrar contraseña' }))
     expect(field()).toHaveAttribute('type', 'text')
@@ -32,18 +36,42 @@ describe('PasswordInput', () => {
     expect(field()).toHaveValue('Secreta123')
   })
 
-  it('en modo controlado obedece a visible y avisa del cambio pedido', async () => {
+  it('sin controlar también avisa de cada cambio', async () => {
+    const user = userEvent.setup()
+    const onRevealedChange = vi.fn()
+    render(<PasswordInput placeholder="clave" onRevealedChange={onRevealedChange} />)
+
+    await user.click(screen.getByRole('button', { name: 'Mostrar contraseña' }))
+    await user.click(screen.getByRole('button', { name: 'Ocultar contraseña' }))
+
+    expect(onRevealedChange.mock.calls).toEqual([[true], [false]])
+  })
+
+  it('en modo controlado obedece a revealed y avisa del cambio pedido', async () => {
     const onVisibleChange = vi.fn()
     const { rerender } = render(
-      <PasswordInput placeholder="clave" visible={false} onVisibleChange={onVisibleChange} />,
+      <PasswordInput placeholder="clave" revealed={false} onRevealedChange={onVisibleChange} />,
     )
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Mostrar contraseña' }))
     expect(onVisibleChange).toHaveBeenCalledWith(true)
     expect(field()).toHaveAttribute('type', 'password')
 
-    rerender(<PasswordInput placeholder="clave" visible={true} onVisibleChange={onVisibleChange} />)
+    rerender(<PasswordInput placeholder="clave" revealed={true} onRevealedChange={onVisibleChange} />)
     expect(field()).toHaveAttribute('type', 'text')
+  })
+
+  it('conserva el hueco del ojo aunque reciba otro relleno horizontal', () => {
+    render(<PasswordInput placeholder="clave" className="px-4" />)
+
+    expect(field()).toHaveClass('px-4', 'pr-10')
+  })
+
+  it('no deja que un type externo pise el que calcula', () => {
+    const sneaky = { type: 'email' } as object
+    render(<PasswordInput placeholder="clave" {...sneaky} />)
+
+    expect(field()).toHaveAttribute('type', 'password')
   })
 
   it('deshabilita el campo y el botón a la vez', () => {

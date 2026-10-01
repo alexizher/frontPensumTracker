@@ -10,6 +10,7 @@ describe('Collapsible', () => {
 
     expect(screen.getByRole('heading', { level: 2, name: 'Electivas' })).toBeInTheDocument()
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(trigger).toHaveAttribute('type', 'button')
     expect(document.getElementById(trigger.getAttribute('aria-controls')!)).toHaveTextContent(
       'contenido',
     )
