@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
+import { clampStart } from '@/domain/pensum'
 import { SubjectCard } from './SubjectCard'
 
 function useVisibleCols() {
@@ -79,9 +80,9 @@ export function PensumGrid({ subjects }: Props) {
     [semesters, startIndex, colsVisible],
   )
 
-  useEffect(() => {
-    setStartIndex(i => Math.min(i, Math.max(0, semesters.length - colsVisible)))
-  }, [colsVisible, semesters.length])
+  // Ajuste durante el render: React repite el render antes de pintar.
+  const start = clampStart(startIndex, semesters.length, colsVisible)
+  if (start !== startIndex) setStartIndex(start)
 
   const selectedSubject = useMemo(
     () => (selectedCode ? (subjects.find(s => s.code === selectedCode) ?? null) : null),
