@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Sin clases de Tailwind: se excluyen para que no generen reglas sin uso. */
+@source not "./test";
+@source not "./domain";
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+
 @theme {
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(240 10% 3.9%);
