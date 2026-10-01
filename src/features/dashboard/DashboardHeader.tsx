@@ -1,9 +1,8 @@
+import type { ReactNode } from 'react'
 import { LogOut } from 'lucide-react'
-import type { PartialRecord } from '@/hooks/useAcademicRecord'
 import { cn } from '@/lib/utils'
 import { IconButton } from '@/components/ui/IconButton'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { VersionSelector } from './VersionSelector'
 
 function LogoutButton({ onReset, className }: { onReset: () => void; className?: string }) {
   return (
@@ -20,28 +19,25 @@ function LogoutButton({ onReset, className }: { onReset: () => void; className?:
 }
 
 interface Props {
-  data: PartialRecord
+  // Sin nombre todavía, la cabecera pinta un esqueleto.
+  studentName?: string
+  programName?: string
+  // Hueco para el selector de versión; vacío si el programa tiene una sola.
+  versionSelector?: ReactNode
   onReset: () => void
-  onChangeVersion: (version: number) => Promise<void>
 }
 
-export function DashboardHeader({ data, onReset, onChangeVersion }: Props) {
-  const hasHeader = data.student_name !== undefined
-  const hasProgram = data.versiones !== undefined && data.pensum_version !== undefined
-  const showVersionSelector = hasProgram && data.versiones!.length > 1
-
+export function DashboardHeader({ studentName, programName, versionSelector, onReset }: Props) {
   return (
     <header className="mb-6 flex flex-col gap-4 border-b border-border pb-4 md:mb-8 md:flex-row md:items-start md:justify-between md:gap-8 md:border-0 md:pb-0">
       <div className="flex min-w-0 items-start gap-2 md:flex-1">
         <div className="min-w-0 flex-1">
-          {hasHeader ? (
+          {studentName !== undefined ? (
             <>
               <h1 className="text-xl font-semibold leading-snug text-foreground break-words md:text-2xl">
-                {data.student_name}
+                {studentName}
               </h1>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                {data.program_name}
-              </p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{programName}</p>
             </>
           ) : (
             <>
@@ -55,15 +51,7 @@ export function DashboardHeader({ data, onReset, onChangeVersion }: Props) {
 
       <div className="flex w-full flex-col gap-3 md:w-auto md:shrink-0 md:items-end">
         <LogoutButton onReset={onReset} className="hidden md:inline-flex" />
-        {showVersionSelector ? (
-          <VersionSelector
-            currentVersion={data.pensum_version!}
-            versionActual={data.version_actual!}
-            enrolledVersion={data.enrolled_version}
-            versiones={data.versiones!}
-            onChangeVersion={onChangeVersion}
-          />
-        ) : null}
+        {versionSelector}
       </div>
     </header>
   )

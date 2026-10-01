@@ -8,8 +8,8 @@ interface StatusStyle {
   badge: string
 }
 
-// Única fuente de etiquetas y colores por estado de materia.
-export const SUBJECT_STATUS: Record<SubjectStatus, StatusStyle> = {
+// Etiqueta y colores de cada estado de materia.
+export const SUBJECT_STATUS = {
   passed: {
     label: 'Aprobada',
     card: 'bg-green-100 border-green-300 text-green-900',
@@ -35,9 +35,10 @@ export const SUBJECT_STATUS: Record<SubjectStatus, StatusStyle> = {
     card: 'bg-gray-50 border-gray-200 text-gray-400 border-dashed',
     badge: 'bg-gray-50 text-gray-400',
   },
-}
+} satisfies Record<SubjectStatus, StatusStyle>
 
-// Estados que aparecen en la leyenda de la malla, con el color de su punto.
+// Estados que aparecen en la leyenda de la malla, en orden, con el color de su punto.
+// "No requerida" no está: solo aplica a electivas y no tiene punto.
 export const STATUS_LEGEND: { status: SubjectStatus; dot: string }[] = [
   { status: 'passed', dot: 'bg-green-400' },
   { status: 'in_progress', dot: 'bg-blue-400' },

@@ -30,8 +30,8 @@ export function PensumGrid({ subjects }: Props) {
   )
 
   // Ajuste durante el render: React repite el render antes de pintar.
-  const start = clampStart(startIndex, semesters.length, colsVisible)
-  if (start !== startIndex) setStartIndex(start)
+  const clampedStart = clampStart(startIndex, semesters.length, colsVisible)
+  if (clampedStart !== startIndex) setStartIndex(clampedStart)
 
   const subjectsByCode = useMemo(() => indexByCode(subjects), [subjects])
 

@@ -6,7 +6,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 interface Props {
   onSubmit: (username: string, password: string) => void;
   loading: boolean;
-  error?: string | null;
+  error: string | null;
 }
 
 export function LoginForm({ onSubmit, loading, error }: Props) {
@@ -76,6 +76,7 @@ export function LoginForm({ onSubmit, loading, error }: Props) {
           </a>
         </p>
       </div>
+      {/* Hermano del formulario, no hijo: conserva la posición que tenía en App. */}
       {error ? (
         <p className="text-destructive text-sm text-center mt-2">{error}</p>
       ) : null}

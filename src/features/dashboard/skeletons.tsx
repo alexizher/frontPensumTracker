@@ -1,3 +1,5 @@
+import { GAUGE_COLORS } from './gauge-colors'
+
 export function GaugeSkeleton() {
   return (
     <div className="animate-pulse">
@@ -5,7 +7,7 @@ export function GaugeSkeleton() {
         <path
           d="M 20 100 A 80 80 0 0 1 180 100"
           fill="none"
-          stroke="#e5e7eb"
+          stroke={GAUGE_COLORS.track}
           strokeWidth={14}
           strokeLinecap="round"
         />

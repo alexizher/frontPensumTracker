@@ -14,7 +14,7 @@ function passwordInput() {
 describe('LoginForm', () => {
   it('deshabilita el envío hasta que hay usuario y contraseña', async () => {
     const user = userEvent.setup()
-    render(<LoginForm onSubmit={vi.fn()} loading={false} />)
+    render(<LoginForm onSubmit={vi.fn()} loading={false} error={null} />)
     const submit = screen.getByRole('button', { name: 'Ver mi pensum' })
 
     expect(submit).toBeDisabled()
@@ -26,7 +26,7 @@ describe('LoginForm', () => {
 
   it('no acepta solo espacios como credenciales', async () => {
     const user = userEvent.setup()
-    render(<LoginForm onSubmit={vi.fn()} loading={false} />)
+    render(<LoginForm onSubmit={vi.fn()} loading={false} error={null} />)
 
     await user.type(usernameInput(), '   ')
     await user.type(passwordInput(), '   ')
@@ -37,7 +37,7 @@ describe('LoginForm', () => {
   it('envía usuario y contraseña al pulsar el botón', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    render(<LoginForm onSubmit={onSubmit} loading={false} />)
+    render(<LoginForm onSubmit={onSubmit} loading={false} error={null} />)
 
     await user.type(usernameInput(), 'ana.prueba')
     await user.type(passwordInput(), 'Secreta123')
@@ -50,7 +50,7 @@ describe('LoginForm', () => {
   it('envía con Enter desde el campo de contraseña', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    render(<LoginForm onSubmit={onSubmit} loading={false} />)
+    render(<LoginForm onSubmit={onSubmit} loading={false} error={null} />)
 
     await user.type(usernameInput(), 'ana.prueba')
     await user.type(passwordInput(), 'Secreta123{Enter}')
@@ -60,7 +60,7 @@ describe('LoginForm', () => {
 
   it('muestra y vuelve a ocultar la contraseña con el botón del ojo', async () => {
     const user = userEvent.setup()
-    render(<LoginForm onSubmit={vi.fn()} loading={false} />)
+    render(<LoginForm onSubmit={vi.fn()} loading={false} error={null} />)
     await user.type(passwordInput(), 'Secreta123')
     expect(passwordInput()).toHaveAttribute('type', 'password')
 
@@ -75,7 +75,7 @@ describe('LoginForm', () => {
   it('el botón del ojo no envía el formulario', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
-    render(<LoginForm onSubmit={onSubmit} loading={false} />)
+    render(<LoginForm onSubmit={onSubmit} loading={false} error={null} />)
     await user.type(usernameInput(), 'ana.prueba')
     await user.type(passwordInput(), 'Secreta123')
 
@@ -86,7 +86,7 @@ describe('LoginForm', () => {
 
   it('oculta la contraseña al enviar', async () => {
     const user = userEvent.setup()
-    render(<LoginForm onSubmit={vi.fn()} loading={false} />)
+    render(<LoginForm onSubmit={vi.fn()} loading={false} error={null} />)
     await user.type(usernameInput(), 'ana.prueba')
     await user.type(passwordInput(), 'Secreta123')
     await user.click(screen.getByRole('button', { name: 'Mostrar contraseña' }))
@@ -103,6 +103,7 @@ describe('LoginForm', () => {
     const message = screen.getByText('Credenciales inválidas')
 
     expect(message.tagName).toBe('P')
+    expect(message).toHaveClass('text-destructive', 'text-sm', 'text-center', 'mt-2')
     expect(message.previousElementSibling).toBe(container.firstElementChild)
   })
 
@@ -113,7 +114,7 @@ describe('LoginForm', () => {
   })
 
   it('mientras carga bloquea los campos y cambia el texto del botón', () => {
-    render(<LoginForm onSubmit={vi.fn()} loading={true} />)
+    render(<LoginForm onSubmit={vi.fn()} loading={true} error={null} />)
 
     expect(screen.getByRole('button', { name: 'Cargando pensum...' })).toBeDisabled()
     expect(usernameInput()).toBeDisabled()

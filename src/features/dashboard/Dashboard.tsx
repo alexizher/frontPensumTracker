@@ -8,6 +8,7 @@ import { PensumGridSkeleton, TableSkeleton } from '@/features/pensum/skeletons'
 import { CreditsSummary } from './CreditsSummary'
 import { DashboardHeader } from './DashboardHeader'
 import { GaugeSkeleton } from './skeletons'
+import { VersionSelector } from './VersionSelector'
 
 interface Props {
   data: PartialRecord
@@ -18,12 +19,28 @@ interface Props {
 
 // El expediente llega por etapas: cada bloque se pinta cuando ya tiene sus datos.
 export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
+  const hasProgram = data.versiones !== undefined && data.pensum_version !== undefined
   const hasSubjects = Array.isArray(data.subjects)
   const isComplete = data.completed_credits !== undefined
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:p-6">
-      <DashboardHeader data={data} onReset={onReset} onChangeVersion={onChangeVersion} />
+      <DashboardHeader
+        studentName={data.student_name}
+        programName={data.program_name}
+        onReset={onReset}
+        versionSelector={
+          hasProgram && data.versiones!.length > 1 ? (
+            <VersionSelector
+              currentVersion={data.pensum_version!}
+              versionActual={data.version_actual!}
+              enrolledVersion={data.enrolled_version}
+              versiones={data.versiones!}
+              onChangeVersion={onChangeVersion}
+            />
+          ) : null
+        }
+      />
 
       {error ? (
         <Alert variant="error" className="mb-6">
@@ -40,10 +57,10 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
       <div className="mx-auto mb-8 max-w-xs">
         {isComplete ? (
           <CreditsSummary
-            progress={data.progress_credits!}
+            towardDegree={data.progress_credits!}
             inProgress={data.in_progress_credits!}
             total={data.total_credits!}
-            completed={data.completed_credits!}
+            takenTotal={data.completed_credits!}
           />
         ) : (
           <GaugeSkeleton />

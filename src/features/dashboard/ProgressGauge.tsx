@@ -1,20 +1,10 @@
 import { gaugeFractions } from "@/domain/progress";
+import { GAUGE_COLORS as COLORS } from "./gauge-colors";
 
 const CX = 100;
 const CY = 100;
 const R = 80;
 const NEEDLE_R = 65;
-
-// En hexadecimal a propósito: la paleta de Tailwind 4 no tiene estos mismos valores.
-const COLORS = {
-  track: "#e5e7eb",
-  completed: "#22c55e",
-  inProgress: "#3b82f6",
-  needle: "#1f2937",
-  percent: "#111827",
-  caption: "#6b7280",
-  scale: "#9ca3af",
-};
 
 function angleToPoint(deg: number, r: number, cx: number, cy: number) {
   const rad = Math.PI - (deg * Math.PI) / 180;
