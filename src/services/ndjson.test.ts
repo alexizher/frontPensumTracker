@@ -46,6 +46,37 @@ describe('readNdjson', () => {
     expect(await collect(streamOf('\n  \n{"a":1}\n\n'))).toEqual([{ a: 1 }])
   })
 
+  it('entrega todas las líneas que llegan juntas en un mismo chunk', async () => {
+    expect(await collect(streamOf('{"a":1}\n{"a":2}\n{"a":3}\n'))).toEqual([
+      { a: 1 },
+      { a: 2 },
+      { a: 3 },
+    ])
+  })
+
+  it('no pierde eventos cuando el cuerpo empieza con una línea vacía', async () => {
+    expect(await collect(streamOf('\n{"a":1}\n{"a":2}\n'))).toEqual([{ a: 1 }, { a: 2 }])
+  })
+
+  it('ignora los espacios que queden al final sin salto de línea', async () => {
+    expect(await collect(streamOf('{"a":1}\n  '))).toEqual([{ a: 1 }])
+  })
+
+  it('entrega cada objeto en cuanto su línea está completa, sin esperar al cierre', async () => {
+    let controller!: ReadableStreamDefaultController<Uint8Array>
+    const stream = new ReadableStream<Uint8Array>({ start: c => void (controller = c) })
+    const iterator = readNdjson<{ a: number }>(stream)
+
+    controller.enqueue(encoder.encode('{"a":1}\n{"a"'))
+    expect(await iterator.next()).toEqual({ done: false, value: { a: 1 } })
+
+    controller.enqueue(encoder.encode(':2}\n'))
+    expect(await iterator.next()).toEqual({ done: false, value: { a: 2 } })
+
+    controller.close()
+    expect(await iterator.next()).toEqual({ done: true, value: undefined })
+  })
+
   it('no entrega nada de un stream vacío', async () => {
     expect(await collect(streamOf())).toEqual([])
   })

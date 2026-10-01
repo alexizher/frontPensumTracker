@@ -20,5 +20,9 @@ export async function streamLoginAndFetch(
     throw new Error(err?.detail ?? 'Error al iniciar sesión')
   }
 
-  for await (const event of readNdjson<StreamEvent>(res.body)) onEvent(event)
+  for await (const event of readNdjson<StreamEvent | null>(res.body)) {
+    // `null` es JSON válido pero no es un evento. Se corta aquí para que no llegue al reducer.
+    if (event === null) throw new Error('Respuesta inesperada del servidor')
+    onEvent(event)
+  }
 }

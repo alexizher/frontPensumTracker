@@ -111,6 +111,16 @@ describe('streamLoginAndFetch', () => {
     expect(events).toEqual([errorEvent])
   })
 
+  it('rechaza si una línea es null, después de entregar las anteriores', async () => {
+    stubFetch(() => new Response(`${JSON.stringify(errorEvent)}\nnull\n`))
+    const events: StreamEvent[] = []
+
+    await expect(
+      streamLoginAndFetch('a', 'b', 0, event => events.push(event)),
+    ).rejects.toThrow('Respuesta inesperada del servidor')
+    expect(events).toEqual([errorEvent])
+  })
+
   it('deja pasar el error de red', async () => {
     stubFetch(() => Promise.reject(new TypeError('Failed to fetch')))
 

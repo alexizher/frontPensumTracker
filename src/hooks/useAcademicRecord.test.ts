@@ -166,6 +166,17 @@ describe('useAcademicRecord', () => {
     expect(result.current.error).toEqual(expect.any(String))
   })
 
+  it('una línea null en el stream termina como error visible y conserva lo recibido', async () => {
+    stubFetch(() => new Response(`${JSON.stringify(recordEvents[0])}\nnull\n`))
+    const { result } = renderHook(() => useAcademicRecord())
+
+    await act(() => result.current.load('ana.prueba', 'Secreta123'))
+
+    expect(result.current.status).toBe('error')
+    expect(result.current.error).toBe('Respuesta inesperada del servidor')
+    expect(result.current.data?.student_name).toBe('Ana Prueba')
+  })
+
   it('un intento nuevo borra el error y los datos del anterior', async () => {
     const pending = deferred(recordEvents)
     stubFetch(() => ndjsonResponse(partialError), pending.responder)
