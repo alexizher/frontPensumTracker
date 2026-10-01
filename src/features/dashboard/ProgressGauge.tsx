@@ -5,6 +5,17 @@ const CY = 100;
 const R = 80;
 const NEEDLE_R = 65;
 
+// En hexadecimal a propósito: la paleta de Tailwind 4 no tiene estos mismos valores.
+const COLORS = {
+  track: "#e5e7eb",
+  completed: "#22c55e",
+  inProgress: "#3b82f6",
+  needle: "#1f2937",
+  percent: "#111827",
+  caption: "#6b7280",
+  scale: "#9ca3af",
+};
+
 function angleToPoint(deg: number, r: number, cx: number, cy: number) {
   const rad = Math.PI - (deg * Math.PI) / 180;
   return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
@@ -53,7 +64,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
       <path
         d={arcPath(0, 180, R, CX, CY)}
         fill="none"
-        stroke="#e5e7eb"
+        stroke={COLORS.track}
         strokeWidth={14}
         strokeLinecap="round"
       />
@@ -62,7 +73,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         <path
           d={arcPath(0, completedDeg, R, CX, CY)}
           fill="none"
-          stroke="#22c55e"
+          stroke={COLORS.completed}
           strokeWidth={14}
           strokeLinecap="round"
         />
@@ -72,7 +83,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         <path
           d={arcPath(completedDeg, completedDeg + inProgressDeg, R, CX, CY)}
           fill="none"
-          stroke="#3b82f6"
+          stroke={COLORS.inProgress}
           strokeWidth={14}
           strokeLinecap="round"
         />
@@ -83,11 +94,11 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         y1={CY}
         x2={needle.x.toFixed(2)}
         y2={needle.y.toFixed(2)}
-        stroke="#1f2937"
+        stroke={COLORS.needle}
         strokeWidth={2}
         strokeLinecap="round"
       />
-      <circle cx={CX} cy={CY} r={4} fill="#1f2937" />
+      <circle cx={CX} cy={CY} r={4} fill={COLORS.needle} />
 
       <text
         x={CX}
@@ -95,7 +106,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         textAnchor="middle"
         fontSize={20}
         fontWeight="700"
-        fill="#111827"
+        fill={COLORS.percent}
       >
         {percent}%
       </text>
@@ -104,7 +115,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         y={CY + _MARGIN_TO_ARCH}
         textAnchor="middle"
         fontSize={10}
-        fill="#6b7280"
+        fill={COLORS.caption}
       >
         aprobado
       </text>
@@ -114,7 +125,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         y={CY + _MARGIN_TO_ARCH}
         textAnchor="middle"
         fontSize={9}
-        fill="#9ca3af"
+        fill={COLORS.scale}
       >
         0
       </text>
@@ -123,7 +134,7 @@ export function ProgressGauge({ completed, inProgress, total }: Props) {
         y={CY + _MARGIN_TO_ARCH}
         textAnchor="middle"
         fontSize={9}
-        fill="#9ca3af"
+        fill={COLORS.scale}
       >
         {total}
       </text>
