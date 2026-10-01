@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
-import { clampStart } from '@/domain/pensum'
+import { clampStart, groupBySemester, indexByCode, resolvePrerequisites } from '@/domain/pensum'
 import { SubjectCard } from './SubjectCard'
 
 function useVisibleCols() {
@@ -53,27 +53,7 @@ export function PensumGrid({ subjects }: Props) {
   const [startIndex, setStartIndex] = useState(0)
   const colsVisible = useVisibleCols()
 
-  const electives = useMemo(
-    () => subjects.filter(s => s.semester === 0 || s.semester === null || s.semester === 99),
-    [subjects],
-  )
-
-  const bySemester = useMemo(
-    () =>
-      subjects.reduce<Record<number, Subject[]>>((acc, s) => {
-        const sem = s.semester ?? 0
-        if (sem === 0 || sem === 99) return acc
-        acc[sem] = acc[sem] ?? []
-        acc[sem].push(s)
-        return acc
-      }, {}),
-    [subjects],
-  )
-
-  const semesters = useMemo(
-    () => Object.keys(bySemester).map(Number).sort((a, b) => a - b),
-    [bySemester],
-  )
+  const { semesters, bySemester, electives } = useMemo(() => groupBySemester(subjects), [subjects])
 
   const visibleSemesters = useMemo(
     () => semesters.slice(startIndex, startIndex + colsVisible),
@@ -89,19 +69,12 @@ export function PensumGrid({ subjects }: Props) {
     [selectedCode, subjects],
   )
 
-  const subjectsByCode = useMemo(() => {
-    const map = new Map<string, Subject>()
-    for (const s of subjects) map.set(s.code, s)
-    return map
-  }, [subjects])
+  const subjectsByCode = useMemo(() => indexByCode(subjects), [subjects])
 
-  const selectedPrereqs = useMemo(() => {
-    if (!selectedSubject) return []
-    return selectedSubject.prerequisites.map(code => {
-      const found = subjectsByCode.get(code)
-      return { code, name: found?.name ?? code }
-    })
-  }, [selectedSubject, subjectsByCode])
+  const selectedPrereqs = useMemo(
+    () => (selectedSubject ? resolvePrerequisites(selectedSubject, subjectsByCode) : []),
+    [selectedSubject, subjectsByCode],
+  )
 
   const canGoLeft = startIndex > 0
   const canGoRight = startIndex + colsVisible < semesters.length

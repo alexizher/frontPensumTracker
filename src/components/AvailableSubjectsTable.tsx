@@ -1,24 +1,14 @@
 import { useMemo } from 'react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
+import { availableSubjects } from '@/domain/pensum'
 
 interface Props {
   subjects: Subject[]
 }
 
 export function AvailableSubjectsTable({ subjects }: Props) {
-  const available = useMemo(
-    () =>
-      subjects
-        .filter(s => s.status === 'available')
-        .sort((a, b) => {
-          const semA = a.semester ?? 999
-          const semB = b.semester ?? 999
-          if (semA !== semB) return semA - semB
-          return a.name.localeCompare(b.name)
-        }),
-    [subjects],
-  )
+  const available = useMemo(() => availableSubjects(subjects), [subjects])
 
   if (available.length === 0) {
     return (
