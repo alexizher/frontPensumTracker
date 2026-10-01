@@ -4,6 +4,9 @@ import type { ElectiveBank, Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
 import { indexByCode } from '@/domain/pensum'
 import { percentOf } from '@/domain/progress'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 const statusStyles: Record<Subject['status'], string> = {
   passed: 'bg-green-100 text-green-800',
@@ -42,21 +45,13 @@ function BankItem({ bank, subjects }: BankItemProps) {
             {bank.credits_approved} / {bank.credits_required} créditos
           </span>
         </div>
-        <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-green-500 transition-all"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
+        <ProgressBar percent={percent} />
       </div>
 
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex min-h-11 w-full cursor-pointer items-center gap-1 px-4 text-sm text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-      >
+      <Button variant="ghost" onClick={() => setOpen(o => !o)} className="w-full">
         {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         {open ? 'Ocultar materias' : `Ver ${bank.subject_codes.length} materias`}
-      </button>
+      </Button>
 
       {open ? (
         <ul className="divide-y divide-gray-100">
@@ -69,14 +64,9 @@ function BankItem({ bank, subjects }: BankItemProps) {
                   <span className="truncate text-gray-800">{subject?.name ?? '—'}</span>
                 </div>
                 {subject ? (
-                  <span
-                    className={cn(
-                      'text-xs px-2 py-0.5 rounded-full shrink-0 ml-2',
-                      statusStyles[subject.status],
-                    )}
-                  >
+                  <Badge className={cn('ml-2 shrink-0', statusStyles[subject.status])}>
                     {statusLabel[subject.status]}
-                  </span>
+                  </Badge>
                 ) : null}
               </li>
             )
