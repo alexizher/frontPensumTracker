@@ -96,6 +96,22 @@ describe('LoginForm', () => {
     expect(passwordInput()).toHaveAttribute('type', 'password')
   })
 
+  it('muestra el error que recibe, debajo del formulario', () => {
+    const { container } = render(
+      <LoginForm onSubmit={vi.fn()} loading={false} error="Credenciales inválidas" />,
+    )
+    const message = screen.getByText('Credenciales inválidas')
+
+    expect(message.tagName).toBe('P')
+    expect(message.previousElementSibling).toBe(container.firstElementChild)
+  })
+
+  it('no pinta ningún mensaje cuando no hay error', () => {
+    const { container } = render(<LoginForm onSubmit={vi.fn()} loading={false} error={null} />)
+
+    expect(container.children).toHaveLength(1)
+  })
+
   it('mientras carga bloquea los campos y cambia el texto del botón', () => {
     render(<LoginForm onSubmit={vi.fn()} loading={true} />)
 

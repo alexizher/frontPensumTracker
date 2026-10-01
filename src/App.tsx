@@ -22,10 +22,8 @@ export default function App() {
         <LoginForm
           onSubmit={load}
           loading={status === 'loading'}
+          error={status === 'error' ? error : null}
         />
-        {status === 'error' && error ? (
-          <p className="text-destructive text-sm text-center mt-2">{error}</p>
-        ) : null}
       </div>
     </div>
   )
