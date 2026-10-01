@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 interface Props {
   onSubmit: (username: string, password: string) => void;
@@ -30,54 +32,35 @@ export function CookieInput({ onSubmit, loading }: Props) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium">Usuario</label>
-          <input
+          <Input
             type="text"
             autoComplete="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={loading}
             placeholder="tu.usuario"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <div className="space-y-1">
           <label className="text-sm font-medium">Contraseña</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              className="w-full rounded-md border border-input bg-background pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              disabled={loading}
-              aria-label={
-                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
-              aria-pressed={showPassword}
-              className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-50"
-            >
-              {showPassword ? (
-                <EyeOff className="size-4" aria-hidden="true" />
-              ) : (
-                <Eye className="size-4" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            visible={showPassword}
+            onVisibleChange={setShowPassword}
+          />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading || !username.trim() || !password.trim()}
-          className="w-full rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium disabled:opacity-50"
+          className="w-full"
         >
           {loading ? "Cargando pensum..." : "Ver mi pensum"}
-        </button>
+        </Button>
       </form>
       <p className="text-muted-foreground text-sm mb-6">
         Esta app no almacena tu información personal. Los datos son procesados y

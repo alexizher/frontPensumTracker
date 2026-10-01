@@ -9,6 +9,8 @@ import {
   isPrerequisiteOf,
   resolvePrerequisites,
 } from '@/domain/pensum'
+import { Alert } from '@/components/ui/Alert'
+import { IconButton } from '@/components/ui/IconButton'
 import { SubjectCard } from './SubjectCard'
 
 function useVisibleCols() {
@@ -92,28 +94,24 @@ export function PensumGrid({ subjects }: Props) {
         <h2 className="text-base font-semibold text-foreground">Pensum</h2>
         {semesters.length > colsVisible ? (
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
+            <IconButton
               onClick={() => setStartIndex(i => i - 1)}
               disabled={!canGoLeft}
               aria-label="Semestres anteriores"
-              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-md border border-input text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronLeft className="size-4" aria-hidden="true" />
-            </button>
+            </IconButton>
             <span className="text-xs tabular-nums text-muted-foreground">
               {startIndex + 1}–{Math.min(startIndex + colsVisible, semesters.length)}{' '}
               de {semesters.length}
             </span>
-            <button
-              type="button"
+            <IconButton
               onClick={() => setStartIndex(i => i + 1)}
               disabled={!canGoRight}
               aria-label="Semestres siguientes"
-              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-md border border-input text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronRight className="size-4" aria-hidden="true" />
-            </button>
+            </IconButton>
           </div>
         ) : null}
       </div>
@@ -132,11 +130,7 @@ export function PensumGrid({ subjects }: Props) {
       </div>
 
       {selectedSubject ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="mb-3 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-950"
-        >
+        <Alert variant="info" role="status" aria-live="polite" className="mb-3">
           <p className="font-medium leading-snug">{selectedSubject.name}</p>
           {selectedPrereqs.length > 0 ? (
             <ul className="mt-1.5 space-y-1 text-sm leading-snug text-orange-900/90">
@@ -153,7 +147,7 @@ export function PensumGrid({ subjects }: Props) {
           ) : (
             <p className="mt-1 text-sm text-orange-900/80">Sin prerrequisitos</p>
           )}
-        </div>
+        </Alert>
       ) : null}
 
       <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${visibleSemesters.length}, minmax(0, 1fr))` }}>

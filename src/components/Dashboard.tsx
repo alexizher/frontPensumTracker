@@ -1,13 +1,18 @@
-import { useId, useState, useTransition, type ReactNode } from 'react'
-import { ChevronDown, LogOut } from 'lucide-react'
+import { useId, useTransition } from 'react'
+import { LogOut } from 'lucide-react'
 import type { PartialRecord } from '@/hooks/useAcademicRecord'
 import { cn } from '@/lib/utils'
 import { extraCredits } from '@/domain/progress'
+import { Alert } from '@/components/ui/Alert'
+import { Collapsible } from '@/components/ui/Collapsible'
+import { IconButton } from '@/components/ui/IconButton'
+import { Select } from '@/components/ui/Select'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { ProgressGauge } from './ProgressGauge'
 import { PensumGrid } from './PensumGrid'
 import { AvailableSubjectsTable } from './AvailableSubjectsTable'
 import { ElectiveBanks } from './ElectiveBanks'
-import { Skeleton, GaugeSkeleton, PensumGridSkeleton, TableSkeleton } from './Skeletons'
+import { GaugeSkeleton, PensumGridSkeleton, TableSkeleton } from './Skeletons'
 
 interface VersionSelectorProps {
   currentVersion: number
@@ -51,20 +56,20 @@ function VersionSelector({
         <label htmlFor={selectId} className="shrink-0 text-sm font-medium text-muted-foreground">
           Pensum
         </label>
-        <select
+        <Select
           id={selectId}
           value={currentVersion}
           onChange={handleChange}
           disabled={isPending}
           aria-describedby={showAssignedHint ? helpId : undefined}
-          className="min-h-11 min-w-0 flex-1 cursor-pointer rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 md:w-auto md:flex-none md:text-sm"
+          className="min-w-0 flex-1 md:w-auto md:flex-none"
         >
           {versiones.map(v => (
             <option key={v} value={v}>
               {labelFor(v)}
             </option>
           ))}
-        </select>
+        </Select>
         {isPending ? (
           <span className="shrink-0 text-sm text-muted-foreground" aria-live="polite">
             Cargando...
@@ -82,53 +87,15 @@ function VersionSelector({
 
 function LogoutButton({ onReset, className }: { onReset: () => void; className?: string }) {
   return (
-    <button
-      type="button"
+    <IconButton
+      variant="danger"
       onClick={onReset}
       aria-label="Cerrar sesión"
       title="Cerrar sesión"
-      className={cn(
-        'inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border bg-secondary text-foreground shadow-sm transition-colors duration-200 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        className,
-      )}
+      className={cn('shrink-0', className)}
     >
       <LogOut className="size-5" strokeWidth={2.25} aria-hidden="true" />
-    </button>
-  )
-}
-
-function CollapsibleSection({
-  title,
-  defaultOpen = true,
-  children,
-}: {
-  title: string
-  defaultOpen?: boolean
-  children: ReactNode
-}) {
-  const [open, setOpen] = useState(defaultOpen)
-  const panelId = useId()
-
-  return (
-    <section className="mb-10">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        aria-expanded={open}
-        aria-controls={panelId}
-        className="mb-4 flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-md text-left transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        <ChevronDown
-          className={cn(
-            'size-5 shrink-0 text-muted-foreground transition-transform duration-200',
-            open ? 'rotate-0' : '-rotate-90',
-          )}
-          aria-hidden="true"
-        />
-      </button>
-      {open ? <div id={panelId}>{children}</div> : null}
-    </section>
+    </IconButton>
   )
 }
 
@@ -186,15 +153,15 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
       </header>
 
       {error ? (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <Alert variant="error" className="mb-6">
           {error}
-        </div>
+        </Alert>
       ) : null}
 
       {data.graduated ? (
-        <div className="mb-6 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-emerald-800">
+        <Alert variant="success" className="mb-6">
           Completaste todos los créditos del plan. No tienes materias pendientes para el grado.
-        </div>
+        </Alert>
       ) : null}
 
       <div className="mx-auto mb-8 max-w-xs">
@@ -232,17 +199,17 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
         )}
       </section>
 
-      <CollapsibleSection title="Materias disponibles">
+      <Collapsible title="Materias disponibles">
         {isComplete ? <AvailableSubjectsTable subjects={data.subjects!} /> : <TableSkeleton />}
-      </CollapsibleSection>
+      </Collapsible>
 
-      <CollapsibleSection title="Electivas">
+      <Collapsible title="Electivas">
         {isComplete ? (
           <ElectiveBanks banks={data.elective_banks!} subjects={data.subjects!} />
         ) : (
           <TableSkeleton rows={3} />
         )}
-      </CollapsibleSection>
+      </Collapsible>
     </div>
   )
 }
