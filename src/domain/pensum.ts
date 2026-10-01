@@ -55,6 +55,10 @@ export function resolvePrerequisites(
   return subject.prerequisites.map(code => ({ code, name: index.get(code)?.name ?? code }))
 }
 
+export function isPrerequisiteOf(subject: Subject | null, code: string): boolean {
+  return subject?.prerequisites.includes(code) ?? false
+}
+
 // Materias disponibles, por semestre y nombre. Las que no tienen semestre van al final.
 export function availableSubjects(subjects: Subject[]): Subject[] {
   return subjects

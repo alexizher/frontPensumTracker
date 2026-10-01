@@ -6,6 +6,7 @@ import {
   groupBySemester,
   indexByCode,
   isElective,
+  isPrerequisiteOf,
   resolvePrerequisites,
 } from './pensum'
 
@@ -163,6 +164,24 @@ describe('resolvePrerequisites', () => {
 
   it('devuelve una lista vacía si no hay prerrequisitos', () => {
     expect(resolvePrerequisites(subject('X', 2), index)).toEqual([])
+  })
+})
+
+describe('isPrerequisiteOf', () => {
+  const target = subject('X', 2, { prerequisites: ['MAT101', 'PRG101'] })
+
+  it('reconoce los prerrequisitos de la materia', () => {
+    expect(isPrerequisiteOf(target, 'MAT101')).toBe(true)
+    expect(isPrerequisiteOf(target, 'PRG101')).toBe(true)
+  })
+
+  it('descarta los códigos que no son prerrequisito, incluida la propia materia', () => {
+    expect(isPrerequisiteOf(target, 'FIS101')).toBe(false)
+    expect(isPrerequisiteOf(target, 'X')).toBe(false)
+  })
+
+  it('devuelve false cuando no hay materia seleccionada', () => {
+    expect(isPrerequisiteOf(null, 'MAT101')).toBe(false)
   })
 })
 

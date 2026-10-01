@@ -1,6 +1,6 @@
 export interface GaugeFractions {
-  completed: number
-  inProgress: number
+  completedFraction: number
+  inProgressFraction: number
   percent: number
 }
 
@@ -21,10 +21,11 @@ export function gaugeFractions(
 ): GaugeFractions {
   const safeTotal = total > 0 ? total : 1
   const completedFraction = Math.min(1, completed / safeTotal)
-  const inProgressFraction = Math.min(Math.max(0, 1 - completedFraction), inProgress / safeTotal)
-  return {
-    completed: completedFraction,
-    inProgress: inProgressFraction,
-    percent: Math.round(completedFraction * 100),
-  }
+  const inProgressFraction = Math.min(1 - completedFraction, inProgress / safeTotal)
+  return { completedFraction, inProgressFraction, percent: Math.round(completedFraction * 100) }
+}
+
+// Créditos cursados por encima del total que exige el plan.
+export function extraCredits(completed: number, total: number): number {
+  return Math.max(0, completed - total)
 }

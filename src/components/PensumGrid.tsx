@@ -2,7 +2,13 @@ import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Subject } from '@/types/academic'
 import { cn } from '@/lib/utils'
-import { clampStart, groupBySemester, indexByCode, resolvePrerequisites } from '@/domain/pensum'
+import {
+  clampStart,
+  groupBySemester,
+  indexByCode,
+  isPrerequisiteOf,
+  resolvePrerequisites,
+} from '@/domain/pensum'
 import { SubjectCard } from './SubjectCard'
 
 function useVisibleCols() {
@@ -64,12 +70,9 @@ export function PensumGrid({ subjects }: Props) {
   const start = clampStart(startIndex, semesters.length, colsVisible)
   if (start !== startIndex) setStartIndex(start)
 
-  const selectedSubject = useMemo(
-    () => (selectedCode ? (subjects.find(s => s.code === selectedCode) ?? null) : null),
-    [selectedCode, subjects],
-  )
-
   const subjectsByCode = useMemo(() => indexByCode(subjects), [subjects])
+
+  const selectedSubject = selectedCode ? (subjectsByCode.get(selectedCode) ?? null) : null
 
   const selectedPrereqs = useMemo(
     () => (selectedSubject ? resolvePrerequisites(selectedSubject, subjectsByCode) : []),
@@ -157,7 +160,7 @@ export function PensumGrid({ subjects }: Props) {
         {visibleSemesters.map(sem => (
           <div key={sem} className="min-w-0">
             <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {sem === 0 ? 'Libre' : `Sem ${sem}`}
+              Sem {sem}
             </div>
             <div className="flex flex-col gap-2">
               {bySemester[sem].map(s => (
@@ -165,7 +168,7 @@ export function PensumGrid({ subjects }: Props) {
                   key={s.code}
                   subject={s}
                   isSelected={selectedCode === s.code}
-                  isPrereq={selectedSubject?.prerequisites.includes(s.code) ?? false}
+                  isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
                   onClick={handleCardClick}
                 />
               ))}
@@ -185,7 +188,7 @@ export function PensumGrid({ subjects }: Props) {
                 key={s.code}
                 subject={s}
                 isSelected={selectedCode === s.code}
-                isPrereq={selectedSubject?.prerequisites.includes(s.code) ?? false}
+                isPrereq={isPrerequisiteOf(selectedSubject, s.code)}
                 onClick={handleCardClick}
               />
             ))}

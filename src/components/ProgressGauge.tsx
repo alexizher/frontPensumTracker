@@ -32,13 +32,13 @@ interface Props {
 
 export function ProgressGauge({ completed, inProgress, total }: Props) {
   // Topar al 100%: ni el arco ni la aguja deben pasar de 180°.
-  const { completed: completedFrac, inProgress: inProgressFrac, percent } = gaugeFractions(
+  const { completedFraction, inProgressFraction, percent } = gaugeFractions(
     completed,
     inProgress,
     total,
   );
-  const completedDeg = completedFrac * 180;
-  const inProgressDeg = inProgressFrac * 180;
+  const completedDeg = completedFraction * 180;
+  const inProgressDeg = inProgressFraction * 180;
   const needleDeg = Math.min(180, completedDeg + inProgressDeg);
   const _MARGIN_TO_ARCH = 20;
 

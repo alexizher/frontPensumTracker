@@ -2,6 +2,7 @@ import { useId, useState, useTransition, type ReactNode } from 'react'
 import { ChevronDown, LogOut } from 'lucide-react'
 import type { PartialRecord } from '@/hooks/useAcademicRecord'
 import { cn } from '@/lib/utils'
+import { extraCredits } from '@/domain/progress'
 import { ProgressGauge } from './ProgressGauge'
 import { PensumGrid } from './PensumGrid'
 import { AvailableSubjectsTable } from './AvailableSubjectsTable'
@@ -144,6 +145,7 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
   const hasSubjects = Array.isArray(data.subjects)
   const isComplete = data.completed_credits !== undefined
   const showVersionSelector = hasProgram && data.versiones!.length > 1
+  const extra = isComplete ? extraCredits(data.completed_credits!, data.total_credits!) : 0
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:p-6">
@@ -209,10 +211,10 @@ export function Dashboard({ data, error, onReset, onChangeVersion }: Props) {
                 <span className="text-blue-600"> · {data.in_progress_credits} en curso</span>
               ) : null}
             </div>
-            {data.completed_credits! > data.total_credits! ? (
+            {extra > 0 ? (
               <div className="mt-1 text-center text-xs text-emerald-700">
                 Has cursado {data.completed_credits} créditos en total
-                ({data.completed_credits! - data.total_credits!} adicionales al plan)
+                ({extra} adicionales al plan)
               </div>
             ) : null}
           </>
