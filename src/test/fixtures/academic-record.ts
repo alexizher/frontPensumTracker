@@ -84,6 +84,7 @@ export const recordEvents: StreamEvent[] = [
     data: {
       pensum_version: record.pensum_version,
       version_actual: record.version_actual,
+      enrolled_version: record.enrolled_version,
       versiones: record.versiones,
       total_credits: record.total_credits,
     },
