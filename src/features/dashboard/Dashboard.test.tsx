@@ -79,6 +79,17 @@ describe('Dashboard con el expediente a medio llegar', () => {
     expect(screen.getByText('12 / 35 créditos para el grado')).toBeInTheDocument()
     expect(screen.queryByText(/en curso/)).not.toBeInTheDocument()
   })
+
+  it('muestra los créditos faltantes contando los que están en curso', () => {
+    renderDashboard({
+      ...record,
+      total_credits: 168,
+      progress_credits: 77,
+      in_progress_credits: 21,
+    })
+
+    expect(screen.getByText(/70 créditos faltantes/)).toBeInTheDocument()
+  })
 })
 
 describe('Dashboard: selector de versión', () => {

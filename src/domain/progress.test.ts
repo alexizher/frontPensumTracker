@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extraCredits, gaugeFractions, percentOf } from './progress'
+import { extraCredits, gaugeFractions, percentOf, remainingCredits } from './progress'
 
 describe('percentOf', () => {
   it('redondea al entero más cercano', () => {
@@ -70,5 +70,16 @@ describe('extraCredits', () => {
   it('devuelve 0 cuando lo cursado no supera el total', () => {
     expect(extraCredits(35, 35)).toBe(0)
     expect(extraCredits(10, 35)).toBe(0)
+  })
+})
+
+describe('remainingCredits', () => {
+  it('cuenta los créditos en curso como parte del avance', () => {
+    expect(remainingCredits(77, 21, 168)).toBe(70)
+  })
+
+  it('devuelve 0 cuando el avance alcanza o supera el plan', () => {
+    expect(remainingCredits(77, 21, 98)).toBe(0)
+    expect(remainingCredits(100, 10, 98)).toBe(0)
   })
 })
