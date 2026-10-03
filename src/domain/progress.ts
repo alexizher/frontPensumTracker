@@ -29,3 +29,8 @@ export function gaugeFractions(
 export function extraCredits(completed: number, total: number): number {
   return Math.max(0, completed - total)
 }
+
+// Créditos que faltan, contando como completados los que están en curso.
+export function remainingCredits(completed: number, inProgress: number, total: number): number {
+  return Math.max(0, total - completed - inProgress)
+}

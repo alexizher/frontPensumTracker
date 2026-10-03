@@ -1,4 +1,4 @@
-import { extraCredits } from '@/domain/progress'
+import { extraCredits, remainingCredits } from '@/domain/progress'
 import { ProgressGauge } from './ProgressGauge'
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
 
 export function CreditsSummary({ towardDegree, inProgress, total, takenTotal }: Props) {
   const extra = extraCredits(takenTotal, total)
+  const remaining = remainingCredits(towardDegree, inProgress, total)
 
   return (
     <>
@@ -20,6 +21,11 @@ export function CreditsSummary({ towardDegree, inProgress, total, takenTotal }: 
         {towardDegree} / {total} créditos para el grado
         {inProgress > 0 ? <span className="text-blue-600"> · {inProgress} en curso</span> : null}
       </div>
+      {remaining > 0 ? (
+        <div className="mt-1 text-center text-sm text-muted-foreground">
+          {remaining} {remaining === 1 ? 'crédito faltante' : 'créditos faltantes'}
+        </div>
+      ) : null}
       {extra > 0 ? (
         <div className="mt-1 text-center text-xs text-emerald-700">
           Has cursado {takenTotal} créditos en total

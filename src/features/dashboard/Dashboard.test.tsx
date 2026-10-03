@@ -40,6 +40,41 @@ describe('Dashboard', () => {
       ),
     ).toBeInTheDocument()
   })
+
+  it('muestra los créditos faltantes contando los que están en curso', () => {
+    renderDashboard({
+      ...record,
+      total_credits: 168,
+      progress_credits: 77,
+      in_progress_credits: 21,
+    })
+
+    expect(screen.getByText('70 créditos faltantes')).toBeInTheDocument()
+  })
+
+  it('usa singular cuando falta un crédito', () => {
+    renderDashboard({
+      ...record,
+      total_credits: 35,
+      progress_credits: 34,
+      in_progress_credits: 0,
+    })
+
+    expect(screen.getByText('1 crédito faltante')).toBeInTheDocument()
+  })
+
+  it('no muestra créditos faltantes cuando no queda ninguno', () => {
+    renderDashboard({
+      ...record,
+      graduated: true,
+      total_credits: 35,
+      progress_credits: 35,
+      in_progress_credits: 0,
+    })
+
+    expect(screen.getByText(/Completaste todos los créditos/)).toBeInTheDocument()
+    expect(screen.queryByText(/créditos? faltantes/)).not.toBeInTheDocument()
+  })
 })
 
 describe('Dashboard con el expediente a medio llegar', () => {
@@ -79,6 +114,7 @@ describe('Dashboard con el expediente a medio llegar', () => {
     expect(screen.getByText('12 / 35 créditos para el grado')).toBeInTheDocument()
     expect(screen.queryByText(/en curso/)).not.toBeInTheDocument()
   })
+
 })
 
 describe('Dashboard: selector de versión', () => {
